@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Concordance</title>
+    <style>
+        /* Small, self-contained styles to ensure the file input is white and accessible */
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: #f5f5f7;
+            color: #111;
+            padding: 2rem;
+        }
+        .upload-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 1.25rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        label[for="file-upload"] {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        input[type="file"] {
+            background-color: #ffffff; /* explicit white background */
+            color: #111;
+            border: 1px solid #d0d0d5;
+            padding: 0.5rem 0.6rem;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .help {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        /* Tags pane styles */
+        .tags-pane {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            align-items: center;
+            overflow-x: auto; /* keep horizontal layout when many tags */
+            padding-bottom: 0.25rem;
+        }
+        .tag-button {
+            background: rgba(173, 216, 230, 0.5); /* light blue semi-transparent */
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            color: #022;
+            padding: 0.45rem 0.9rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tag-button:hover {
+            background: rgba(173, 216, 230, 0.7);
+        }
+        .tag-button.active {
+            background: rgba(144, 238, 144, 0.8); /* light green when pressed */
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        .tag-button:active {
+            transform: translateY(1px);
+        }
+        .user-input-container {
+            margin-top: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .user-input {
+            width: 100%;
+            padding: 0.5rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid #d0d0d5;
+            background: #fff;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+        .submit-container {
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: flex-start; /* align left with input */
+        }
+        .submit-button {
+            background: rgba(173,216,230,0.9); /* light blue */
+            border: 1px solid rgba(0,0,0,0.06);
+            color: #022;
+            padding: 0.45rem 0.9rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .submit-button:active { transform: translateY(1px); }
+
+        /* Text window representing lines of text */
+        .text-window {
+            margin-top: 1rem;
+            background: #ffffff;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            min-height: 220px;
+            border: 1px solid rgba(0,0,0,0.04);
+            overflow: auto;
+        }
+        .text-window pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #111;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+            font-size: 0.95rem;
+            line-height: 1.45;
+        }
+
+        /* Make sure the tags pane visually separates from file input on small screens */
+        @media (max-width: 640px) {
+            .upload-container { padding: 1rem; }
+            .tag-button { padding: 0.3rem 0.6rem; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+<main class="upload-container">
+    <label for="file-upload">upload sources:</label>
+    <input id="file-upload"
+           type="file"
+           name="sources"
+           accept=".txt,text/plain"
+           multiple
+           aria-describedby="file-help">
+    <div id="file-help" class="help">Select one or more plain text (.txt) files. The browser's accept is advisory — validate on the server.</div>
+
+    <!-- Load button -->
+    <div class="submit-container">
+        <button id="load-button" class="submit-button" type="button" aria-label="Load selected files">Load</button>
+    </div>
+
+    <!-- Tags pane: buttons will be generated here from a topics list -->
+    <div id="tags-pane" class="tags-pane" role="group" aria-label="Topics tags">
+        <!-- Buttons inserted by JavaScript -->
+    </div>
+
+    <!-- Single text input field for user insertion -->
+    <div class="user-input-container">
+        <input id="user-input" class="user-input" type="text" placeholder="Type here and press Enter..." aria-label="User input field">
+    </div>
+
+    <!-- Submit button that triggers the same action as pressing Enter -->
+    <div class="submit-container">
+        <button id="submit-button" class="submit-button" type="button" aria-label="Submit user input">Submit</button>
+    </div>
+
+    <!-- White text window that represents lines of text -->
+    <div class="text-window" id="text-window" role="region" aria-label="Lines of text">
+        <pre id="text-lines">{% if result_lines %}{{ result_lines|join('\n') }}{% else %}Line 1: Lorem ipsum dolor sit amet.
+Line 2: Consectetur adipiscing elit.
+Line 3: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+(Upload files to replace these example lines.){% endif %}</pre>
+    </div>
+
+</main>
+
+<script>
+    // Topics passed from Flask; use server-provided `topics` variable.
+    // Jinja will serialize the Python list into JSON. If `topics` is not provided, this will be `null` — we coerce to an array.
+    const topics = {{ topics|tojson }} || [];
+
+    const tagsPane = document.getElementById('tags-pane');
+
+    function createTagButton(tag) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tag-button';
+        btn.setAttribute('aria-pressed', 'false');
+        btn.textContent = tag;
+
+        btn.addEventListener('click', () => {
+            const isActive = btn.classList.toggle('active');
+            btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            // Optionally, dispatch a custom event so other parts of your app can react.
+            tagsPane.dispatchEvent(new CustomEvent('tags-changed', { detail: { tag: tag, active: isActive } }));
+        });
+
+        return btn;
+    }
+
+    // Populate the tags pane with buttons laid out horizontally. Multiple buttons can be active.
+    topics.forEach(t => tagsPane.appendChild(createTagButton(t)));
+
+    // Example: listen for tags changes
+    tagsPane.addEventListener('tags-changed', (e) => {
+        // e.detail -> { tag, active }
+        console.log('Tag toggled:', e.detail);
+        // If you want to reflect selected tags somewhere else, collect them:
+        // const selected = Array.from(tagsPane.querySelectorAll('.tag-button.active')).map(b => b.textContent);
+    });
+
+    // Optional: If you want to replace the example lines with uploaded file contents later,
+    // hook into the file input change event and read files as text.
+    const fileInput = document.getElementById('file-upload');
+    const loadButton = document.getElementById('load-button');
+
+    loadButton.addEventListener('click', async (ev) => {
+        const files = fileInput.files;
+        if (!files || files.length === 0) {
+            alert('Please select files first');
+            return;
+        }
+        // For demo: read the first file and display its first ~2000 characters in the text window.
+        const f = files[0];
+        try {
+            const text = await f.text();
+            const preview = text.slice(0, 2000);
+            document.getElementById('text-lines').textContent = preview || '(File empty)';
+        } catch (err) {
+            console.error('Failed to read file', err);
+            alert('Failed to read file: ' + err.message);
+        }
+    });
+
+    fileInput.addEventListener('change', async (ev) => {
+        // Optional: auto-preview on file selection
+        // (commented out so Load button is required)
+        // const files = ev.target.files;
+        // if (!files || files.length === 0) return;
+    });
+
+    // User input behavior: press Enter to append the input into the text window
+    const userInput = document.getElementById('user-input');
+    if (userInput) {
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const v = userInput.value.trim();
+                if (!v) return;
+                const pre = document.getElementById('text-lines');
+                // Append on a new line
+                if (pre.textContent && !pre.textContent.endsWith('\n')) pre.textContent += '\n';
+                pre.textContent += v;
+                userInput.value = '';
+                // Emit event for other parts of the app
+                tagsPane.dispatchEvent(new CustomEvent('user-input', { detail: { text: v } }));
+            }
+        });
+    }
+
+    // Submit button click: send all field data to server
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) {
+        submitButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const v = userInput.value.trim();
+
+            // Get selected tags
+            const selectedTags = Array.from(tagsPane.querySelectorAll('.tag-button.active'))
+                .map(b => b.textContent);
+
+            // Get uploaded files WITH CONTENT
+            const uploadedFilesWithContent = [];
+            for (const f of fileInput.files) {
+                try {
+                    const content = await f.text();
+                    uploadedFilesWithContent.push({
+                        name: f.name,
+                        size: f.size,
+                        type: f.type,
+                        content: content
+                    });
+                } catch (err) {
+                    console.error(`Failed to read file ${f.name}:`, err);
+                    alert(`Failed to read file ${f.name}: ${err.message}`);
+                    return;
+                }
+            }
+
+            // Get text from text window
+            const textWindowContent = document.getElementById('text-lines').textContent;
+
+            // Collect all field data
+            const allData = {
+                user_input: v,
+                selected_tags: selectedTags,
+                uploaded_files: uploadedFilesWithContent,
+                text_window_content: textWindowContent,
+                timestamp: new Date().toISOString()
+            };
+
+            console.debug(`Submitting all data:`, JSON.stringify(allData, null, 2));
+
+            if (!v && uploadedFilesWithContent.length === 0) {
+                alert('Please enter text or upload files');
+                return;
+            }
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(allData)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Append the submitted text to the text window
+                    const pre = document.getElementById('text-lines');
+                    if (v) {
+                        if (pre.textContent && !pre.textContent.endsWith('\n')) {
+                            pre.textContent += '\n';
+                        }
+                        pre.textContent += `✓ Submitted: ${v}`;
+                    }
+                    userInput.value = '';
+                    userInput.focus();
+                    console.log('Submission successful:', result.message);
+                } else {
+                    alert('Error: ' + (result.error || 'Unknown error'));
+                    console.error('Submission failed:', result);
+                }
+            } catch (err) {
+                console.error('Submission failed:', err);
+                alert('Failed to submit: ' + err.message);
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,66 @@
+            with self.connection.cursor() as cur:
+                cur.execute("SELECT id FROM tags WHERE name = :name", [tag_name])
+                tag_row = cur.fetchone()
+                if not tag_row:
+                    continue  # Tag not found, skip this file
+                tag_id = tag_row[0]
+
+            # Read tokens from file and insert into tokens table
+            with open(file_path, 'r', encoding='utf-8') as f:
+                for line_num, line in enumerate(f, start=1):
+                    token = line.strip()
+                    if not token:
+                        continue  # Skip empty lines
+
+                    with self.connection.cursor() as cur:
+                        cur.execute(
+                            "INSERT INTO tokens (text_id, token, page, line, position, tag_id) "
+                            "VALUES (:text_id, :token, :page, :line, :position, :tag_id)",
+                            [None, token, None, line_num, None, tag_id]
+                        )
+                        # Update the tags.usage_count for the tag this token belongs to.
+                        try:
+                            cur.execute(
+                                "UPDATE tags SET usage_count = NVL(usage_count, 0) + 1 WHERE id = :id",
+                                [tag_id]
+                            )
+                        except Exception as e:
+                            print(f"Warning: failed to update usage_count for tag_id {tag_id}: {e}")
+                            pass
+                self.connection.commit()
+
+    def load_tags_list(self):
+        # If not connected, leave tags_list empty and return silently.
+        if not self.connection:
+            self.tags_list = []
+            return
+
+        with self.connection.cursor() as cur:
+            cur.execute("SELECT name FROM tags")
+            rows = cur.fetchall()
+            self.tags_list = [row[0] for row in rows]
+
+    def get_tags_list(self)->List[str]:
+        if not self.tags_list:
+            self.load_tags_list()
+            print(f"Tags loaded from database: {self.tags_list}")
+        if not self.tags_list:
+            print("No tags loaded from database Alternative : using constant tags list")
+            self.tags_list = RootDataStack.constant_tags_list
+        return self.tags_list
+
+    def insert_into_text_table(self, path:str, tag_id:int, metadata_id:int):
+        with self.connection.cursor() as cur:
+            cur.execute(
+                "INSERT INTO text (path, tag_id, metadata_id) VALUES (:path, :tag_id, :metadata_id)",
+                [path, tag_id, metadata_id]
+            )
+            self.connection.commit()
+
+    def generate_tokens_root_vector(self) -> List[str]:
+        vector = []
+        with self.connection.cursor() as cur:
+            cur.execute('SELECT token, name FROM tokens JOIN tags ON tokens.tag_id = tags.id')
+            vector = cur.fetchall()
+
+        return vector

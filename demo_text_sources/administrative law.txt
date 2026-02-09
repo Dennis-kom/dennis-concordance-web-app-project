@@ -1,0 +1,58 @@
+administrative law
+Administrative law is the branch of law governing the creation and operation of administrative agencies. The powers granted to administrative agencies are particularly important, along with the substantive rules that such agencies make, and the legal relationships between agencies, other government bodies, and the public at large.
+
+Overview
+Administrative law encompasses laws and legal principles governing the administration and regulation of government agencies (both federal and state). Agencies are delegated power by Congress (or in the case of a state agency, the state legislature), to take on the responsibility for carrying out certain prerogatives from Congress. Agencies are created through their own organic statutes, which establish new laws, and in doing so, create the respective agencies to interpret, administer, and enforce those new laws. Generally, administrative agencies are created to protect a public interest rather than to vindicate private rights.
+
+Structure of Agencies
+Some textualist scholars argue that administrative agencies are unconstitutional, particularly because of the arguably unconstitutional delegation of law-making power. Nonetheless, the current jurisprudence in administrative law deems agencies constitutional, and necessary in a functional and pragmatic sense. Indeed, because Congress cannot enforce and administer every law it enacts, it must rely on the agencies to administer, enforce, and otherwise regulate various federal laws that Congress has enacted. Some of the most notable agencies are the executive agencies such as the Department of Justice and the Department of Defense. Other examples include some independent agencies such as the Federal Trade Commission, Securities and Exchange Commission, and the Environmental Protection Agency, all of which are independent from the direct control of the President. These agencies have enormous power to enact various rules defining and interpreting relevant statutes, enforce those rules, and adjudicate matters according to those regulations.
+
+Statutory Regulation of Agencies
+However, despite the agencies’ enormous powers, the governmental agencies must still act within Constitutional and statutory parameters. These and other limits have been codified, for the most part, into a statute known as the Administrative Procedure Act (APA) and state analogs, which provides for the roles and powers of all the agencies, and the procedures by which they must abide by in all their functions. APA categorizes administrative functions into formal and informal rulemaking and adjudication, which have binding effects, as well as guidance, which has no binding effect. The APA further prescribes certain procedural rules by which the agencies need to follow before acting in one of the functions listed.
+
+The APA is a remedial statute designed to ensure uniformity and openness in the procedures used by federal agencies. The Act is a comprehensive regulatory scheme governing regulations, adjudications, and rulemaking in general terms. The APA is the major source for federal administrative agency law, while state agencies' administration and regulation are governed by comparable state acts.
+
+For example, under the federal APA and judicial interpretations of the APA, agencies purporting to engage in the rulemaking function must give notice of proposed rulemaking before adopting the final rule. The final rule must follow a logical outgrowth of the proposed rule and must display the agencies’ consideration of all comments received and reviewed.
+
+In its adjudicatory functions, the agencies often have their own judicial body, known as the Administrative Law Judge, who are part of their respective agency, but must be independent from the agency officials involved in certain actions. The administrative law judges are to adjudicate claims or disputes involving the agency, as an impartial trier of fact and law, and are prohibited by APA from engaging in any ex parte contact with the agency, unless upon notice and opportunities to all parties involved in the proceeding.
+
+Finally, the agencies have much fewer procedural limitations in its guidance actions, where the agencies can issue interpretive rulings or guidance letters explaining its stance on certain rules, etc., but without the force of law.
+
+Judicial Review of Agency Actions
+Loper Bright Enterprises v. Raimondo (2024)
+Chevron U.S.A., Inc. v. NRDC, 467 U.S. 837 (1984)
+Auer v. Robbins, 519 U.S. 452 (1997)
+Skidmore v. Swift, 323 U.S. 134 (1944)
+One important aspect of the administrative law is the judicial deference given by the courts to the agencies. The level of deference afforded to administrative agencies has varied over time (see below). However; in 2024, the Supreme Court overturned Chevron U.S.A., Inc. v. NRDC, 467 U.S. 837 (1984); in Loper Bright Enterprises v. Raimondo.
+
+Under Chevron deference, courts applied an extremely deferential standard of review, in which they deferred to agency interpretations of such statutes unless they were determined to be unreasonable.
+
+Under the Auer deference, courts deferred to the agency interpretations of its own ambiguous regulations. Akin to the Chevron deference, the Court decided that the agency’s interpretation of its own regulations were binding unless it was plainly erroneous or inconsistent with the regulation.
+
+If the Chevron or Auer deference did not apply, then the Skidmore deference applied, in which the courts did not give a binding deference to the agency’s interpretation but gave varying amounts of deference according to the agency’s expertise in the particular matter. 
+
+In Loper Bright, the Supreme Court decided that Chevron deference exceeded the guidelines laid out in the Administrative Procedure Act. Going forward, courts should not grant blind deference to the statutory interpretations of administrative agencies, but instead must “independently interpret the statute and effectuate the will of Congress subject to constitutional limits.” See Loper Bright.  A court engages in this task by “recognizing constitutional delegations, fixing the boundaries of the delegated authority, and ensuring the agency has engaged in ‘reasoned decision-making’ within those boundaries.”  
+
+Federal Material
+Federal Statutes
+5 U.S.C. - Government Organization and Employees
+5 U.S.C. Ch. 5 - Federal Administrative Procedure Act
+Federal Agency Regulations
+See generally the Code of Federal Regulations
+Federal Judicial Decisions
+Recent Administrative Law Decisions
+Loper Bright Enterprises v. Raimondo (2024)
+Chevron U.S.A., Inc. v. NRDC, 467 U.S. 837 (1984)
+Auer v. Robbins, 519 U.S. 452 (1997)
+Shell Oil Co. v. E.P.A., 950 F.2d 741 (D.C. Cir. 1991)
+Skidmore v. Swift, 323 U.S. 134 (1944)
+[Last reviewed in February of 2025 by the Wex Definitions Team]
+
+Wex
+
+THE LEGAL PROCESS
+administrative law
+wex articles
+wex definitions
+business sectors
+legal education and practice
