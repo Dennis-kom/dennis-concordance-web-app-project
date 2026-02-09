@@ -311,13 +311,20 @@ Line 3: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
                 const result = await response.json();
                 if (result.success) {
+                    // Display results from server in text window
+                    if (result.results && result.results.length > 0) {
+                        const pre = document.getElementById('text-lines');
+                        pre.textContent = result.results.join('\n');
+                        console.log(`Displayed ${result.results.length} result lines`);
+                    }
+
                     // Append the submitted text to the text window
-                    const pre = document.getElementById('text-lines');
                     if (v) {
+                        const pre = document.getElementById('text-lines');
                         if (pre.textContent && !pre.textContent.endsWith('\n')) {
                             pre.textContent += '\n';
                         }
-                        pre.textContent += `✓ Submitted: ${v}`;
+                        pre.textContent += `[Submitted] ${v}`;
                     }
                     userInput.value = '';
                     userInput.focus();

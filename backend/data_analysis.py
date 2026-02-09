@@ -1,7 +1,7 @@
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from backend.process_maneger import linking_words
 
-def tokenize_text_content (file_content: str) -> Tuple[List[str], List[List[int, str, int, int, int, int]]]:
+def tokenize_text_content (file_content: str) -> Tuple[List[str], List[Any]]:
     # (text_id, token, page_number, line_number, token_index,tag_id)
     content_vector = []
     tokens_data_dump = []
@@ -21,11 +21,12 @@ def tokenize_text_content (file_content: str) -> Tuple[List[str], List[List[int,
                 tokens_data_dump.append([0, token, 0, line_index, token_index, 0])
     return tokens_list, tokens_data_dump
 
-def grab_lines_with_tokens(token,text_id, line_index, token_index, content):
+def grab_lines_with_tokens(token, content):
     lines = content.split('\n')
     grab_result = []
-    if token in lines[line_index]:
-        grab_result.append(lines[line_index])
+    for line in lines:
+        if token in line:
+            grab_result.append(line)
 
     return grab_result
 

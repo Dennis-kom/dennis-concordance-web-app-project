@@ -174,37 +174,32 @@ def submit():
                                 ...
                                 # TODO: need to create new tag
                                 # TODO: - insert the tokens of the unknown topic as a new tag
-                            try:
-                                suspected_tag_id = db.get_tag_id_by_name(suspected_tag)
-                                db.insert_into_text_table(suspected_tag_id, filename, content)
-                                # insert the tokens into tokens tabe with the tag id - it will be used later to define the tag of the new files
-                                for token in file_tokens:
-                                    for tup in tokens_table_dump:
-                                        try:
-                                            tup[0] = db.find_text_id_by_name(filename)
-                                            tup[5] = suspected_tag_id
-                                            # TODO: need to implemnt with db gasp only
-                                            stack['results'].append(grab_lines_with_tokens(token, tup[0], tup[3],tup[4], content))
-                                        except Exception as e:
-                                            print(f"Error finding text ID for file '{filename}': {e}")
-                                    try:
-                                        db.insert_into_tokens_table(tokens_table_dump)
-
-                                    except Exception as e:
-                                        print(f"Error inserting tokens for file '{filename}' into tokens table: {e}")
-                            except Exception as e:
-                                print(f"Error inserting file '{filename}' into text table with tag '{suspected_tag}': {e}")
+                        try:
+                            suspected_tag_id = db.get_tag_id_by_name(suspected_tag) # get the tag id for insertion
+                            db.insert_into_text_table(suspected_tag_id, filename, content) # inserting the text tuple
+                            # insert the tokens into tokens tabe with the tag id - it will be used later to define the tag of the new files
+                            for tup in tokens_table_dump:
+                                try:
+                                    tup[0] = db.find_text_id_by_name(filename)
+                                    tup[5] = suspected_tag_id
+                                    db.insert_into_tokens_table(tokens_table_dump) # inserting the token into the table
+                                except Exception as e:
+                                    print(f"Error finding text ID for file '{filename}': {e}")
+                                try:
+                                    print(f"Inserting {len(tokens_table_dump)} tokens for file '{filename}' into tokens table with tag ID {suspected_tag_id}")
+                                    # TODO: need to implemnt with db gasp only
+                                    stack['results'].append(grab_lines_with_tokens(user_input, content))
+                                    # print(f"result lines for token {user_input}:\n{stack['results']}")
+                                except Exception as e:
+                                    print(f"Error inserting tokens for file '{filename}' into tokens table: {e}")
+                        except Exception as e:
+                            print(f"Error inserting file '{filename}' into text table with tag '{suspected_tag}': {e}")
 
 
                     except Exception as e:
                         print(f"Error processing file {filename}: {e}")
                         import traceback
                         traceback.print_exc()
-
-                # Example: tokenize the user input if provided
-                if user_input:
-                    tokens, tokens_table_dump = tokenize_text_content(user_input)
-                    print(f"Extracted {len(tokens)} tokens from user input")
 
             return jsonify({
                 'success': True,
@@ -214,7 +209,8 @@ def submit():
                     'tags_count': len(selected_tags),
                     'files_count': len(uploaded_files),
                     'content_length': len(text_window_content)
-                }
+                },
+                'results': stack['results']  # Include results so client can display them
             }), 200
 
         except Exception as e:
