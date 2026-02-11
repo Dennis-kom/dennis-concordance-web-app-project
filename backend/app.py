@@ -168,30 +168,28 @@ def submit():
 
                             print(f"insertng into text table unknown tag")
 
+                            # give to this table temporary tag name - will be defined later
                             if suspected_tag is None or suspected_tag == "Unknown":
-                                # TODO: - give to this table temporary tag name - will be defined later
-                                # TODO: - if no tag matched then it should be a new tag - in this case create a new table of a new tag
+                                # if no tag matched then it should be a new tag - in this case create a new table of a new tag
+                                db.add_tags_new_row("Unknown", 'derived_model')
                                 ...
-                                # TODO: need to create new tag
+
                                 # TODO: - insert the tokens of the unknown topic as a new tag
                         try:
                             suspected_tag_id = db.get_tag_id_by_name(suspected_tag) # get the tag id for insertion
-                            db.insert_into_text_table(suspected_tag_id, filename, content) # inserting the text tuple
+                            db.insert_into_text_table(filename, suspected_tag_id, None) # inserting the text tuple (path, tag_id, metadata_id)
                             # insert the tokens into tokens tabe with the tag id - it will be used later to define the tag of the new files
                             for tup in tokens_table_dump:
-                                try:
-                                    tup[0] = db.find_text_id_by_name(filename)
-                                    tup[5] = suspected_tag_id
-                                    db.insert_into_tokens_table(tokens_table_dump) # inserting the token into the table
-                                except Exception as e:
-                                    print(f"Error finding text ID for file '{filename}': {e}")
-                                try:
-                                    print(f"Inserting {len(tokens_table_dump)} tokens for file '{filename}' into tokens table with tag ID {suspected_tag_id}")
-                                    # TODO: need to implemnt with db gasp only
-                                    stack['results'].append(grab_lines_with_tokens(user_input, content))
-                                    # print(f"result lines for token {user_input}:\n{stack['results']}")
-                                except Exception as e:
-                                    print(f"Error inserting tokens for file '{filename}' into tokens table: {e}")
+                                tup[0] = db.find_text_id_by_name(filename)
+                                tup[5] = suspected_tag_id
+
+                            # Insert all tokens at once after updating them
+                            try:
+                                print(f"Inserting {len(tokens_table_dump)} tokens for file '{filename}' into tokens table with tag ID {suspected_tag_id}")
+                                db.insert_into_tokens_table(tokens_table_dump)
+                                stack['results'].append(grab_lines_with_tokens(user_input, content))
+                            except Exception as e:
+                                print(f"Error inserting tokens for file '{filename}' into tokens table: {e}")
                         except Exception as e:
                             print(f"Error inserting file '{filename}' into text table with tag '{suspected_tag}': {e}")
 
