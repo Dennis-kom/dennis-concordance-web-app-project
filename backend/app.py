@@ -42,6 +42,7 @@ def data_preload():
 
     if not db:
         print("Skipping data_preload: database not available")
+        return
     try:
         db.preload_base_models()
     except Exception as e:
@@ -253,4 +254,4 @@ if __name__ == "__main__":
     # When running locally it's helpful to see which folders are being used.
     print(f"Using templates: {template_folder}")
     print(f"Using static: {static_folder}")
-    app.run(host='127.0.0.1', debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
